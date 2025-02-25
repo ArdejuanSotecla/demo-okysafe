@@ -6,6 +6,7 @@ import { ComponentPropsWithoutRef, ReactNode, useEffect, useRef } from "react";
 import { useAgeConsentModal } from "./age-consent-modal/age-consent-modal-context";
 import { verifyOkysafeResponseAction } from "@/actions/verify-okysafe-response.action";
 import toast from "react-hot-toast";
+import { OKYSAFE_ORIGIN } from "@/lib/constants";
 
 type OkySafeIframeProps = Pick<ComponentPropsWithoutRef<"iframe">, "className">;
 
@@ -21,7 +22,7 @@ export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
       const iframeMessagesEventHandler = async (
         event: MessageEvent
       ): Promise<void> => {
-        if (event.origin !== env.NEXT_PUBLIC_OKYSAFE_ORIGIN) return;
+        if (event.origin !== OKYSAFE_ORIGIN) return;
         if (event.target !== ref.current) return;
 
         const parsedEventDataResult = okysafeEventDataSchema.safeParse(
@@ -59,7 +60,7 @@ export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
     [ref, closeModal]
   );
 
-  const okysafeUrl = new URL(env.NEXT_PUBLIC_OKYSAFE_ORIGIN);
+  const okysafeUrl = new URL(OKYSAFE_ORIGIN);
   okysafeUrl.searchParams.set(
     "client-public-key",
     env.NEXT_PUBLIC_OKYSAFE_CLIENT_PUBLIC_KEY
