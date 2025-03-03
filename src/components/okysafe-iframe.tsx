@@ -5,7 +5,6 @@ import {
   ComponentPropsWithoutRef,
   ReactNode,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import { useAgeConsentModal } from "./age-consent-modal/age-consent-modal-context";
@@ -18,7 +17,9 @@ import { Spinner } from "./ui/spinner";
 type OkySafeIframeProps = Pick<ComponentPropsWithoutRef<"iframe">, "className">;
 
 export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
-  const ref = useRef<HTMLIFrameElement>(null);
+  const [iframeElement, setIframeElement] = useState<HTMLIFrameElement | null>(
+    null
+  );
 
   const { closeModal, isOpen } = useAgeConsentModal();
 
@@ -37,14 +38,14 @@ export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
 
   useEffect(
     function attachIframeEvents() {
-      if (ref.current === null) return;
+      if (iframeElement == null) return;
 
       const iframeMessagesEventHandler = async (
         event: MessageEvent
       ): Promise<void> => {
         if (
           event.origin !== "null" ||
-          event.source !== ref.current?.contentWindow
+          event.source !== iframeElement.contentWindow
         )
           return;
 
@@ -80,7 +81,7 @@ export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
         window.removeEventListener("message", iframeMessagesEventHandler);
       };
     },
-    [ref, closeModal]
+    [iframeElement, closeModal]
   );
 
   if (idToken === null) return <Spinner />;
@@ -91,7 +92,7 @@ export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
 
   return (
     <iframe
-      ref={ref}
+      onLoad={(e) => setIframeElement(e.target as HTMLIFrameElement)}
       src={okysafeUrl.toString()}
       sandbox="allow-scripts allow-top-navigation"
       {...props}
