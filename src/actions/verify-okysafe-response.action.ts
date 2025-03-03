@@ -12,7 +12,7 @@ export const verifyOkysafeResponseAction = async (
   event: OkysafeAlreadyVerifiedEvent
 ): Promise<void> => {
   const hmac = createHmac("sha256", env.OKYSAFE_CLIENT_SECRET_KEY)
-    .update(env.NEXT_PUBLIC_DOMAIN)
+    .update(env.NEXT_PUBLIC_ORIGIN)
     .update(env.NEXT_PUBLIC_OKYSAFE_CLIENT_PUBLIC_KEY)
     .update(event.nonce)
     .digest("hex");
