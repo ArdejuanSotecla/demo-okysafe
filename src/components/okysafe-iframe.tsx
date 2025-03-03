@@ -1,19 +1,39 @@
 "use client";
 
-import { env } from "@/lib/env";
 import { okysafeEventDataSchema } from "@/zod-schemas/okysafe-event-data.schema";
-import { ComponentPropsWithoutRef, ReactNode, useEffect, useRef } from "react";
+import {
+  ComponentPropsWithoutRef,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { useAgeConsentModal } from "./age-consent-modal/age-consent-modal-context";
 import { verifyOkysafeResponseAction } from "@/actions/verify-okysafe-response.action";
 import toast from "react-hot-toast";
 import { OKYSAFE_ORIGIN } from "@/lib/constants";
+import { createIdentificationTokenAction } from "@/actions/create-identification-token.action";
+import { Spinner } from "./ui/spinner";
 
 type OkySafeIframeProps = Pick<ComponentPropsWithoutRef<"iframe">, "className">;
 
 export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
   const ref = useRef<HTMLIFrameElement>(null);
 
-  const { closeModal } = useAgeConsentModal();
+  const { closeModal, isOpen } = useAgeConsentModal();
+
+  const [idToken, setIdToken] = useState<string | null>(null);
+
+  useEffect(
+    function createIdentificationToken() {
+      if (!isOpen) return;
+
+      createIdentificationTokenAction().then((token) => {
+        setIdToken(token);
+      });
+    },
+    [isOpen]
+  );
 
   useEffect(
     function attachIframeEvents() {
@@ -22,8 +42,11 @@ export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
       const iframeMessagesEventHandler = async (
         event: MessageEvent
       ): Promise<void> => {
-        if (event.origin !== OKYSAFE_ORIGIN) return;
-        if (event.target !== ref.current) return;
+        if (
+          event.origin !== "null" ||
+          event.source !== ref.current?.contentWindow
+        )
+          return;
 
         const parsedEventDataResult = okysafeEventDataSchema.safeParse(
           event.data
@@ -60,12 +83,10 @@ export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
     [ref, closeModal]
   );
 
+  if (idToken === null) return <Spinner />;
+
   const okysafeUrl = new URL(OKYSAFE_ORIGIN);
-  okysafeUrl.searchParams.set(
-    "client-public-key",
-    env.NEXT_PUBLIC_OKYSAFE_CLIENT_PUBLIC_KEY
-  );
-  okysafeUrl.searchParams.set("domain", env.NEXT_PUBLIC_DOMAIN);
+  okysafeUrl.searchParams.set("identification-token", idToken);
   okysafeUrl.searchParams.set("optional-verification", "true");
 
   return (
