@@ -59,8 +59,9 @@ export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
 
         switch (okysafeEvent.code) {
           case "okysafe.age-consent-ok": {
-            toast.success("Age consent ok");
-            closeModal(); // IF IS VERIFICATION REQUIRED, NOOP
+            // IF IS VERIFICATION REQUIRED, NOOP
+            // toast.success("Age consent ok");
+            // closeModal();
             break;
           }
           case "okysafe.already-verified": {
@@ -88,7 +89,7 @@ export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
 
   const okysafeUrl = new URL(OKYSAFE_ORIGIN);
   okysafeUrl.searchParams.set("identification-token", idToken);
-  okysafeUrl.searchParams.set("optional-verification", "true");
+  okysafeUrl.searchParams.set("optional-verification", "false");
 
   return (
     <iframe
