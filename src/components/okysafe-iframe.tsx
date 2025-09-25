@@ -89,13 +89,12 @@ export const OkySafeIframe = (props: OkySafeIframeProps): ReactNode => {
 
   const okysafeUrl = new URL(OKYSAFE_ORIGIN);
   okysafeUrl.searchParams.set("identification-token", idToken);
-  okysafeUrl.searchParams.set("optional-verification", "false");
 
   return (
     <iframe
       onLoad={(e) => setIframeElement(e.target as HTMLIFrameElement)}
       src={okysafeUrl.toString()}
-      sandbox="allow-scripts allow-top-navigation"
+      sandbox="allow-scripts allow-top-navigation allow-forms allow-same-origin"
       {...props}
     />
   );

@@ -4,6 +4,7 @@ import { z } from "zod";
 export const env = createEnv({
   server: {
     OKYSAFE_CLIENT_SECRET_KEY: z.string().min(1),
+    OKYSAFE_CLIENT_ID: z.string().uuid(),
   },
   client: {
     NEXT_PUBLIC_ORIGIN: z.string().url(),

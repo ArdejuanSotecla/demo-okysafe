@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import Link from "next/link";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,6 +38,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased dark`}
       >
         <Toaster position="top-right" />
+        <header className="p-4 bg-blue-700 text-white">
+        <Link className="text-4xl font-bold" href="/" prefetch={false}>
+          OkySafe Demo
+        </Link>
+      </header>
         {children}
       </body>
     </html>
